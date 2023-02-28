@@ -7,26 +7,24 @@ def adjust_special_characters(value):
     new_value = new_value.replace("(", "\(")
     return new_value.replace(")", "\)")
 
-def encode_audios(encode_audio_params):
-    audio_base_path = encode_audio_params["audio_base_path"]
-    encode_path = encode_audio_params["encode_path"]
-    audio_name_list = encode_audio_params["audio_name_list"]
-    command = encode_audio_params["command"]
-    param_codec = encode_audio_params["param_codec"]
-    param_value = encode_audio_params["param_value"]
-    extension = encode_audio_params["extension"]
-    codec_type = encode_audio_params["codec_type"]
+def encode_audios(audio_base_path, encode_path, filename_list, encode_params, options):
+    command = encode_params["command"]
+    extension = encode_params["extension"]
+    codec_type = encode_params["codec_type"]
+    param_codec = options.get("param_codec", "")
+    param_value = options.get("param_value", "")
 
     dir_encod_len = len(os.listdir(encode_path))
-    if dir_encod_len == len(audio_name_list):
+    if dir_encod_len == len(filename_list):
         print("Arquivos já codificados em", codec_type.title())
         return
 
-    for name in audio_name_list:
-        name_audio = adjust_special_characters(name)
+    for name in filename_list:
+        adjusted_filename = adjust_special_characters(name)
+        new_filename = adjusted_filename.replace(".wav", f"{extension}")
         params_command = {
-            "audiofile": encode_path + name_audio.replace(".wav", f"{extension}"),
-            "audiofile_wav": audio_base_path + name_audio,
+            "audiofile": f"{encode_path}{new_filename}",
+            "audiofile_wav": f"{audio_base_path}{adjusted_filename}",
             "param_codec": param_codec,
             "param_value": param_value,
         }
@@ -35,18 +33,22 @@ def encode_audios(encode_audio_params):
             print("Ocorreu algum erro no processo:", str(erro))
             return
 
-def decode_audios(path_dir_encod, path_dir_decod, command, extension, codec_type):
-    dir_decod_len = len(os.listdir(path_dir_decod))
+def decode_audios(encod_path, decod_path, decode_params):
+    command = decode_params["command"]
+    extension = decode_params["extension"]
+    codec_type = decode_params["codec_type"]
+    dir_decod_len = len(os.listdir(decod_path))
     if dir_decod_len != 0:
         print("Arquivos já decodificados em", codec_type.title())
         return
 
-    names_audio_encod = os.listdir(path_dir_encod)
-    for name in names_audio_encod:
-        name_audio = adjust_special_characters(name)
+    filenames_encod = os.listdir(encod_path)
+    for filename in filenames_encod:
+        adjusted_filename = adjust_special_characters(filename)
+        new_filename = adjusted_filename.replace(f".{extension}", ".wav")
         params_command = {
-            "audiofile": path_dir_encod + name_audio,
-            "audiofile_wav": path_dir_decod + name_audio.replace(f".{extension}", ".wav")
+            "audiofile": f"{encod_path}{adjusted_filename}",
+            "audiofile_wav": f"{decod_path}{new_filename}",
         }
         erro = os.system(command % params_command)
         if not erro == 0:

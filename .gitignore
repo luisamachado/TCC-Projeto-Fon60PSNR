@@ -131,5 +131,8 @@ dmypy.json
 # Visual Studio Code
 .vscode
 
-decoded_audio_base
-encoded_audio_base
+decode_audio_base
+encode_audio_base
+
+analized
+*.csv

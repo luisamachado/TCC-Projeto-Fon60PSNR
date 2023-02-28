@@ -55,9 +55,15 @@ def audio_encoding_vorbis(
     )
 
 
-def audio_decoding(path_dir_encod, decoded_path, decoded_command, extension, codec_type):
-    codec_audio.decode_audios(
-        path_dir_encod, decoded_path, decoded_command, extension, codec_type)
+def audio_decoding(path_dir_encod, path_dir_decod, decoded_command, extension, codec_type):
+    encode_audio_params = {
+        "path_dir_encod": path_dir_encod,
+        "path_dir_decod": path_dir_decod,
+        "command": decoded_command,
+        "extension": extension,
+        "codec_type": codec_type,
+    }
+    codec_audio.decode_audios(encode_audio_params)
 
 def __main__():
     dir_name_main = os.path.dirname(os.path.realpath(__file__))
