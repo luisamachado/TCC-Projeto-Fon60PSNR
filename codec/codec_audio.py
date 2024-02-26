@@ -25,11 +25,11 @@ def check_file_exist(filename_list, codec_path):
 
         Args:
             filename_list: Lista com os nomes dos arquivos
-            codec_path: Caminho da pasta que será verificada a existência dos arquivos
-                        da lista 'filename_list'
+            codec_path: Caminho da pasta que será verificada a existência dos
+                        arquivos da lista 'filename_list'
 
         Returns:
-            count_exist: Número correspondente a quantidade de arquivos da lista 
+            count_exist: Número correspondente a quantidade de arquivos da lista
                          'filename_list' que está presente na pasta 'codec_path'
     """
     codec_path_list = os.listdir(codec_path)

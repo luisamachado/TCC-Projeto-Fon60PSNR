@@ -3,10 +3,10 @@ from scipy import (interpolate, signal)
 from skimage.metrics import peak_signal_noise_ratio as psnr
 
 
-class Fon60PSNR:
-    def __init__(self):
+class FonPSNR:
+    def __init__(self, fon=60):
         self.f, self.af, self.Lu, self.Tf = self._return_const_iso_226_2003()
-        self.fir = self.create_fir_filter()
+        self.fir = self.create_fir_filter(fon)
 
     @staticmethod
     def _return_const_iso_226_2003():
@@ -41,10 +41,11 @@ class Fon60PSNR:
     
             Args:
                 fon (float): Valor fon da curva.
-                frequencies (:obj:`np.ndarray`, optional): Frequências para avaliar.
-                    Se não for aprovado, todos os 29 pontos do padrão ISO serão retornados.
-                    Quaisquer frequências não presentes no padrão são encontradas através
-                    de interpolação spline.
+                frequencies (:obj:`np.ndarray`, optional): Frequências para
+                    avaliar. Se não for aprovado, todos os 29 pontos do
+                    padrão ISO serão retornados. Quaisquer frequências não
+                    presentes no padrão são encontradas através de
+                    interpolação spline.
 
             Returns:
                 Lp (np.ndarray): valores em db SPL.
@@ -86,7 +87,7 @@ class Fon60PSNR:
             numtaps, freq, gain, window=("kaiser", 0.5), antisymmetric=False)
         return fir
 
-    def fon60psnr(self, original_data, dec_data):
+    def fonpsnr(self, original_data, dec_data):
         original_filtered = signal.filtfilt(self.fir, 1, original_data)
         coded_filtered = signal.filtfilt(self.fir, 1, dec_data)
         data_range = original_filtered.max() - original_filtered.min()

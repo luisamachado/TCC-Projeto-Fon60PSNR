@@ -2,22 +2,25 @@ import audiofile
 import csv
 import locale
 import os
+import audio_metadata
 
 from sklearn.metrics import mean_squared_error as mse
 from skimage.metrics import peak_signal_noise_ratio as psnr
 
-from fon60psnr import Fon60PSNR
+from fonpsnr import FonPSNR
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 
 class AudioAnalyzer:
     def __init__(self, param_type="param_type"):
-        self.fon60psnr = Fon60PSNR()
+        self.fonpsnr = FonPSNR(fon=60)
         self.param_type = param_type
         self.fieldnames = [
             "filename",
             self.param_type,
-            "Fon60PSNR",
+            "original_data_size",
+            "original_bitrate",
+            "FonPSNR",
             "PSNR",
             "PEAQ_ODG",
             "PEAQ_DI",
@@ -41,14 +44,19 @@ class AudioAnalyzer:
         data, _ = audiofile.read(filename)
         return data
 
+    def _read_metadata_file_original(self, filename, info_list):
+        metadata_original = audio_metadata.load(filename)
+        info_list["original_data_size"] = metadata_original.streaminfo._size
+        info_list["original_bitrate"] = metadata_original.streaminfo.bitrate
+
     def calculator(self, original_data, dec_data, info_list):
         if original_data.size == dec_data.size:
             psnr_result = psnr(original_data, dec_data)
             info_list["PSNR"] = self._convert_number_to_locale(psnr_result)
             mse_result = mse(original_data, dec_data)
             info_list["MSE"] = self._convert_number_to_locale(mse_result)
-            fon60psnr_result = self.fon60psnr.fon60psnr(original_data, dec_data)
-            info_list["Fon60PSNR"] = self._convert_number_to_locale(fon60psnr_result)
+            fonpsnr_result = self.fonpsnr.fonpsnr(original_data, dec_data)
+            info_list["FonPSNR"] = self._convert_number_to_locale(fonpsnr_result)
 
     def comparator_peaq(self, original_file_path, dec_file_path, info_list):
         command_peaqb = (
@@ -112,6 +120,7 @@ class AudioAnalyzer:
         )
         original_file_path = os.path.join(audio_base_dir_path, original_filename)
         dec_file_path = os.path.join(self.dec_dir_path, original_filename)
+        self._read_metadata_file_original(original_file_path, info_list)
         original_data = self._read_file(original_file_path)
         dec_data = self._read_file(dec_file_path)
         self.calculator(original_data, dec_data, info_list)
