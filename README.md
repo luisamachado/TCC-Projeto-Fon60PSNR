@@ -1,6 +1,6 @@
 # TCC: Projeto Fon60PSNR
 
-## Execução do programa:
+## Execução do programa
 
 Para execução deste projeto utilize o seguinte comando:
 
